@@ -1,0 +1,92 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+    "width": 590,
+    "height": 600,
+    "title": {"text": "Top 10 Most Valued Unicorn Startups around the World",
+              "fontSize": 14,
+              "font": "Verdana"},
+    "description": "Minimalist Lollipop chart with conditional colouring",
+    "data": {"name": "dataset",
+            "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/DataVis2/data/World_Wide_Unicorn-Company-List-lollipop.csv"},
+    
+    "layer": [
+      {"transform": [
+        {"filter" : "datum.Company== 'Checkout.com'"},
+        {"calculate": "'4 of the top 10 most valued companies are from the Fintech Industry'",
+      "as": "annotation"}
+      ],
+      "mark":{
+        "type" :"text",
+        "dx":-54,
+        "dy" : 20,
+        "fontWeight":"bold",
+        "font" : "Verdana",
+        "fontSize":10
+      },
+      "encoding": {"text":{"field":"annotation"}
+    }},
+      {
+        "description": "Lollipop Stick",
+        "mark": {"type": "bar", "width":8},
+        "encoding": {
+          "x": {
+            "field": "Company",
+            "type": "nominal"
+          },
+          "y": {
+            "field": "Valuation ($B)",
+            "type": "quantitative",
+            "axis": {"grid": false},
+            "scale":{"domain": [0,150]}
+  
+          },
+          "color": {
+            "legend":null,
+            "field":"Industry",
+            "type": "nominal",
+            "scale":{"domain" : ["Artificial Intelligence", "Auto and transportation", "Consumer and retail", "Cybersecurity", "Data management and analytics",
+            "E-commerce and direct-to-consumer", "Edtech", "Fintech", "Hardware", "Health", "Internet software and services",
+            "Mobile and telecommunications", "Other", "Supply chain, logistics, and delivery", "Travel"],
+            "range" : ["#2541B2", "#3F52E3", "#7692E4" ,"#93ABD3", "#B7657B",
+            "#A799B7", "#AC66CC", "#C689C6", "#FFD372","#FE7E6D",
+            "#FFAB76", "#FFCCB3", "#E5CB9F", "#85C88A", "#357C3C"]}
+          }
+        }
+      },
+      {
+        "description": "Lollipop",
+        "mark": {
+          "type": "point",
+          "tooltip": true,
+          "size": 500,
+          "filled": true,
+          "opacity": 1
+        },
+        "encoding": {
+          "color": {
+            "legend":null,
+            "field":"Industry",
+            "type": "nominal",
+            "scale":{"domain" : ["Artificial Intelligence", "Auto and transportation", "Consumer and retail", "Cybersecurity", "Data management and analytics",
+            "E-commerce and direct-to-consumer", "Edtech", "Fintech", "Hardware", "Health", "Internet software and services",
+            "Mobile and telecommunications", "Other", "Supply chain, logistics, and delivery", "Travel"],
+            "range" : ["#2541B2", "#3F52E3", "#7692E4" ,"#93ABD3", "#B7657B",
+            "#A799B7", "#AC66CC", "#C689C6", "#FFD372","#FE7E6D",
+            "#FFAB76", "#FFCCB3", "#E5CB9F", "#85C88A", "#357C3C"]}
+          }
+          ,
+          "x": {
+            "field": "Company",
+            "type": "nominal"
+          },
+          "y": {
+            "field": "Valuation ($B)",
+            "type": "quantitative"
+          }
+        }
+
+      }
+    ],
+    "config": {"view": {"stroke": null}, 
+    "background": "#F6F6F6"}
+} 
