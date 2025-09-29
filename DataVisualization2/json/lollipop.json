@@ -1,93 +1,83 @@
 {
-    "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
-    "width": 590,
-    "height": 600,
-    "title": {"text": "Top 10 Most Valued Unicorn Startups around the World",
-              "fontSize": 14,
-              "font": "Verdana"},
-    "description": "Minimalist Lollipop chart with conditional colouring",
-    "data": {"name": "dataset",
-            "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/DataVisualization2/data/World_Wide_Unicorn-Company-List-lollipop.csv"},
-    
-    "layer": [
-      {"transform": [
-        {"filter" : "datum.Company== 'Checkout.com'"},
-        {"calculate": "'4 of the top 10 most valued companies are from the Fintech Industry'",
-      "as": "annotation"}
-      ],
-      "mark":{
-        "type" :"text",
-        "dx":-54,
-        "dy" : 20,
-        "fontWeight":"bold",
-        "font" : "Verdana",
-        "fontSize":10
-      },
-      "encoding": {"text":{"field":"annotation"}
-    }},
-      {
-        "description": "Lollipop Stick",
-        "mark": {"type": "bar", "width":8},
-        "encoding": {
-          "x": {
-            "field": "Company",
-            "type": "nominal"
-          },
-          "y": {
-            "field": "Valuation ($B)",
-            "type": "quantitative",
-            "axis": {"grid": false},
-            "scale":{"domain": [0,150]}
-  
-          },
-          "color": {
-            "legend":null,
-            "field":"Industry",
-            "type": "nominal",
-            "scale":{"domain" : ["Artificial Intelligence", "Auto and transportation", "Consumer and retail", "Cybersecurity", "Data management and analytics",
-            "E-commerce and direct-to-consumer", "Edtech", "Fintech", "Hardware", "Health", "Internet software and services",
-            "Mobile and telecommunications", "Other", "Supply chain, logistics, and delivery", "Travel"],
-            "range" : ["#2541B2", "#3F52E3", "#7692E4" ,"#93ABD3", "#B7657B",
-            "#A799B7", "#AC66CC", "#C689C6", "#FFD372","#FE7E6D",
-            "#FFAB76", "#FFCCB3", "#E5CB9F", "#85C88A", "#357C3C"]}
-          }
-        }
-      },
-      {
-        "description": "Lollipop",
-        "mark": {
-          "type": "point",
-          "tooltip": true,
-          "size": 500,
-          "filled": true,
-          "opacity": 1
-        },
-        "encoding": {
-          "color": {
-            "legend":null,
-            "field":"Industry",
-            "type": "nominal",
-            "scale":{"domain" : ["Artificial Intelligence", "Auto and transportation", "Consumer and retail", "Cybersecurity", "Data management and analytics",
-            "E-commerce and direct-to-consumer", "Edtech", "Fintech", "Hardware", "Health", "Internet software and services",
-            "Mobile and telecommunications", "Other", "Supply chain, logistics, and delivery", "Travel"],
-            "range" : ["#2541B2", "#3F52E3", "#7692E4" ,"#93ABD3", "#B7657B",
-            "#A799B7", "#AC66CC", "#C689C6", "#FFD372","#FE7E6D",
-            "#FFAB76", "#FFCCB3", "#E5CB9F", "#85C88A", "#357C3C"]}
-          }
-          ,
-          "x": {
-            "field": "Company",
-            "type": "nominal"
-          },
-          "y": {
-            "field": "Valuation ($B)",
-            "type": "quantitative"
-          }
-        }
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "width": 640,
+  "height": 520,
+  "title": {"text": "Top 10 Most Valued Unicorn Startups around the World", "fontSize": 14, "font": "Verdana"},
+  "description": "Lollipop chart highlighting Fintech companies",
+  "data": {
+    "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/DataVisualization2/data/World_Wide_Unicorn-Company-List-lollipop.csv"
+  },
 
+  "transform": [
+    {"calculate": "datum.Industry == 'Fintech' ? 'Fintech' : 'Other'", "as": "Highlight"}
+  ],
+
+  "layer": [
+    {
+      "transform": [
+        {"aggregate": [{"op": "max", "field": "Valuation ($B)", "as": "maxVal"}]},
+        {"calculate": "'4 of the top 10 are in Fintech'", "as": "annotation"}
+      ],
+      "mark": {"type": "text", "align": "left", "font": "Verdana", "fontWeight": "bold", "fontSize": 11, "dx": 6, "dy": -6},
+      "encoding": {
+        "x": {"value": 12},
+        "y": {"value": 10},
+        "text": {"field": "annotation"}
       }
-    ],
-    "config": {"view": {"stroke": null}, 
-    "background": "#F6F6F6"}
-} 
+    },
+
+    {
+      "description": "Lollipop stick",
+      "mark": {"type": "bar", "width": 8},
+      "encoding": {
+        "x": {
+          "field": "Company",
+          "type": "nominal",
+          "sort": "-y",
+          "axis": {"labelAngle": -35, "labelLimit": 120}
+        },
+        "y": {
+          "field": "Valuation ($B)",
+          "type": "quantitative",
+          "axis": {"grid": true, "gridOpacity": 0.25, "title": "Valuation ($B)"},
+          "scale": {"domain": [0, 145]}
+        },
+        "color": {
+          "field": "Highlight",
+          "type": "nominal",
+          "scale": {"domain": ["Other", "Fintech"], "range": ["#C9CED6", "#6C7AE0"]},
+          "legend": {"title": "Industry highlight"}
+        }
+      }
+    },
+
+    {
+      "description": "Lollipop head",
+      "mark": {"type": "point", "size": 380, "filled": true},
+      "encoding": {
+        "x": {"field": "Company", "type": "nominal", "sort": "-y"},
+        "y": {"field": "Valuation ($B)", "type": "quantitative"},
+        "color": {
+          "field": "Highlight",
+          "type": "nominal",
+          "scale": {"domain": ["Other", "Fintech"], "range": ["#AAB2BD", "#6C7AE0"]},
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "Company", "type": "nominal"},
+          {"field": "Industry", "type": "nominal"},
+          {"field": "Valuation ($B)", "type": "quantitative"},
+          {"field": "Country", "type": "nominal"}
+        ]
+      }
+    }
+  ],
+
+  "config": {
+    "view": {"stroke": null},
+    "background": "#F6F6F6",
+    "axis": {"labelFont": "Verdana", "titleFont": "Verdana"}
+  }
+}
+
     
