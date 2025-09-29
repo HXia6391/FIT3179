@@ -1,18 +1,24 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v6.json",
-  "title": {"text": "Valuation by Industry", "fontSize": 14, "font": "Verdana"},
+  "title": {
+    "text": "Valuation by Industry",
+    "fontSize": 14,
+    "font": "Verdana"
+  },
   "width": 600,
   "height": 600,
   "padding": 5,
+
   "signals": [
     {"name": "method", "value": "squarify"},
     {"name": "ratio", "value": 1.6108}
   ],
+
   "data": [
     {
-      "name": "gapminder",
+      "name": "tree",
       "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/DataVisualization2/data/World_Wide_Unicorn-Company-List-treemap.csv",
-      "format": {"type": "csv", "delimiter": ","},
+      "format": {"type": "csv"},
       "transform": [
         {"type": "nest", "keys": ["Industry", "Company"]},
         {
@@ -27,113 +33,135 @@
     },
     {
       "name": "nodes",
-      "source": "gapminder",
+      "source": "tree",
       "transform": [{"type": "filter", "expr": "datum.children"}]
     },
     {
       "name": "leaves",
-      "source": "gapminder",
+      "source": "tree",
       "transform": [{"type": "filter", "expr": "!datum.children"}]
     }
   ],
+
   "scales": [
     {
       "name": "color",
       "type": "ordinal",
-      "domain": {"data": "gapminder", "field": "Industry"},
-      "range": [
-        "#2541B2",
-        "#3F52E3",
-        "#7692E4",
-        "#93ABD3",
-        "#B7657B",
-        "#A799B7",
-        "#AC66CC",
-        "#C689C6",
-        "#FFD372",
-        "#FE7E6D",
-        "#FFAB76",
-        "#FFCCB3",
-        "#E5CB9F",
-        "#85C88A",
-        "#357C3C"
-      ]
-    },
-    {
-      "name": "size",
-      "type": "ordinal",
-      "domain": [0, 1, 2, 3],
-      "range": [256, 28, 20, 14]
-    },
-    {
-      "name": "opacity",
-      "type": "ordinal",
-      "domain": [0, 1, 2, 3],
-      "range": [0.15, 0.5, 0.8, 1]
+      "domain": {"data": "tree", "field": "Industry"},
+      "range": ["#2541B2", "#3F52E3", "#7692E4", "#93ABD3", "#B7657B",
+                "#A799B7", "#AC66CC", "#C689C6", "#FFD372", "#FE7E6D",
+                "#FFAB76", "#FFCCB3", "#E5CB9F", "#85C88A", "#357C3C"]
     }
   ],
+
+  "legends": [
+    {
+      "fill": "color",
+      "title": "Industry",
+      "orient": "bottom",
+      "columns": 3,
+      "encode": {
+        "labels": {"update": {"font": {"value": "Verdana"}, "fontSize": {"value": 10}}},
+        "title": {"update": {"font": {"value": "Verdana"}, "fontSize": {"value": 12}}}
+      }
+    }
+  ],
+
   "marks": [
+    /* Base tiles (colored) */
     {
       "type": "rect",
-      "from": {"data": "gapminder"},
+      "from": {"data": "tree"},
       "encode": {
         "update": {
-          "fill": {"scale": "color", "field": "Industry", "opacity": 0.7},
           "x": {"field": "x0"},
           "x2": {"field": "x1"},
           "y": {"field": "y0"},
           "y2": {"field": "y1"},
+          "fill": {"scale": "color", "field": "Industry"},
           "fillOpacity": {"value": 0.8}
+        },
+        "hover": {"fillOpacity": {"value": 1}}
+      }
+    },
+
+    /* Thick borders for industry groups (parent nodes) */
+    {
+      "type": "rect",
+      "from": {"data": "nodes"},
+      "encode": {
+        "enter": {"stroke": {"value": "#000"}, "strokeWidth": {"value": 1}},
+        "update": {
+          "x": {"field": "x0"},
+          "x2": {"field": "x1"},
+          "y": {"field": "y0"},
+          "y2": {"field": "y1"},
+          "fill": {"value": "transparent"}
         }
       }
     },
+
+    /* Thin white grid over leaves + tooltip & hover effect */
     {
       "type": "rect",
       "from": {"data": "leaves"},
       "encode": {
-        "enter": {"stroke": {"value": "#fff"}, "strokeWidth": {"value": 0.2}},
+        "enter": {"stroke": {"value": "#ffffff"}, "strokeWidth": {"value": 0.2}},
         "update": {
           "x": {"field": "x0"},
-          "y": {"field": "y0"},
           "x2": {"field": "x1"},
+          "y": {"field": "y0"},
           "y2": {"field": "y1"},
           "fill": {"value": "transparent"},
           "tooltip": {
-            "signal": "{\"Industry\": datum.Industry, \"Company\": datum.Company, \"Valuation or Total Valuation ($B)\":datum['Valuation ($B)']}"
+            "signal": "'Industry: ' + datum.Industry + '\\nCompany: ' + datum.Company + '\\nValuation: $' + datum['Valuation ($B)'] + 'B'"
           }
         },
         "hover": {
-          "fill": {"scale": "color", "field": "Industry", "fillOpacity": 1}
+          "fill": {"scale": "color", "field": "Industry"},
+          "fillOpacity": {"value": 1}
         }
       }
     },
+
+    /* Labels for companies (hide 'Other companies', auto-hide in tiny tiles) */
     {
       "type": "text",
-      "from": {"data": "gapminder"},
+      "from": {"data": "leaves"},
       "interactive": false,
       "encode": {
         "enter": {
-          "font": {"value": "Arial"},
+          "font": {"value": "Verdana"},
           "align": {"value": "center"},
-          "baseline": {"value": "top"},
+          "baseline": {"value": "middle"},
           "fill": {"value": "#000"},
-          "text": {"field": "Company"},
-          "fontSize": {"value": 10},
-          "fontStyle": {"value": "bold"},
-          "fillOpacity": [
-            {
-              "test": "datum['Company'] == 'ByteDance' || datum['Company'] == 'SHEIN' || datum['Company'] == 'Canva' || datum['Company'] == 'SpaceX' || datum['Valuation ($B)'] > 140",
-              "value": 1
-            },
-            {"value": 0}
+          "fontWeight": {"value": "bold"},
+          "text": {
+            "signal": "datum.Company == 'Other companies' ? '' : datum.Company"
+          },
+          "fontSize": [
+            {"test": "datum['Valuation ($B)'] > 100", "value": 14},
+            {"test": "datum['Valuation ($B)'] > 50", "value": 12},
+            {"value": 10}
           ]
         },
         "update": {
           "x": {"signal": "0.5 * (datum.x0 + datum.x1)"},
-          "y": {"signal": "0.5 * (datum.y0 + datum.y1)"}
+          "y": {"signal": "0.5 * (datum.y0 + datum.y1)"},
+          "fillOpacity": [
+            {
+              "test": "((datum.x1 - datum.x0) * (datum.y1 - datum.y0) > 1200) || datum['Valuation ($B)'] > 140 || datum.Company=='ByteDance' || datum.Company=='SHEIN' || datum.Company=='Canva' || datum.Company=='SpaceX'",
+              "value": 1
+            },
+            {"value": 0}
+          ]
         }
       }
     }
   ],
-  "config": {"view": {"stroke": null}, "background": null}
+
+  "config": {
+    "view": {"stroke": null},
+    "background": null
+  }
 }
