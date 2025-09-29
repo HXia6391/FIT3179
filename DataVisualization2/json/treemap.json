@@ -1,17 +1,13 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v6.json",
-  "title": {
-    "text": "Valuation by Industry",
-    "fontSize": 14,
-    "font": "Verdana"
-  },
+  "title": {"text": "Valuation by Industry","fontSize": 14,"font": "Verdana"},
   "width": 600,
   "height": 600,
   "padding": 5,
 
   "signals": [
-    {"name": "method", "value": "squarify"},
-    {"name": "ratio", "value": 1.6108}
+    {"name": "method","value": "squarify"},
+    {"name": "ratio","value": 1.6108}
   ],
 
   "data": [
@@ -20,37 +16,31 @@
       "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/DataVisualization2/data/World_Wide_Unicorn-Company-List-treemap.csv",
       "format": {"type": "csv"},
       "transform": [
-        {"type": "nest", "keys": ["Industry", "Company"]},
+        {"type": "nest","keys": ["Industry","Company"]},
         {
           "type": "treemap",
           "field": "Valuation ($B)",
           "method": {"signal": "method"},
           "ratio": {"signal": "ratio"},
           "paddingInner": 1,
-          "size": [{"signal": "width"}, {"signal": "height"}]
+          "size": [{"signal": "width"},{"signal": "height"}]
         }
       ]
     },
-    {
-      "name": "nodes",
-      "source": "tree",
-      "transform": [{"type": "filter", "expr": "datum.children"}]
-    },
-    {
-      "name": "leaves",
-      "source": "tree",
-      "transform": [{"type": "filter", "expr": "!datum.children"}]
-    }
+    {"name": "nodes","source": "tree","transform": [{"type": "filter","expr": "datum.children"}]},
+    {"name": "leaves","source": "tree","transform": [{"type": "filter","expr": "!datum.children"}]}
   ],
 
   "scales": [
     {
       "name": "color",
       "type": "ordinal",
-      "domain": {"data": "tree", "field": "Industry"},
-      "range": ["#2541B2", "#3F52E3", "#7692E4", "#93ABD3", "#B7657B",
-                "#A799B7", "#AC66CC", "#C689C6", "#FFD372", "#FE7E6D",
-                "#FFAB76", "#FFCCB3", "#E5CB9F", "#85C88A", "#357C3C"]
+      "domain": {"data": "tree", "field": "Industry", "sort": true},
+      "range": [
+        "#A2D2FF", "#BDE0FE", "#D7E3FC", "#CDB4DB", "#F1C0E8",
+        "#FFC8DD", "#FFAFCC", "#FFD6A5", "#FFDFD3", "#FEE440",
+        "#E2F0CB", "#BEE1C3", "#B8E0D2", "#CAF0F8", "#B5EAEA"
+      ]
     }
   ],
 
@@ -68,63 +58,41 @@
   ],
 
   "marks": [
-    /* Base tiles (colored) */
     {
       "type": "rect",
       "from": {"data": "tree"},
       "encode": {
         "update": {
-          "x": {"field": "x0"},
-          "x2": {"field": "x1"},
-          "y": {"field": "y0"},
-          "y2": {"field": "y1"},
+          "x": {"field": "x0"}, "x2": {"field": "x1"},
+          "y": {"field": "y0"}, "y2": {"field": "y1"},
           "fill": {"scale": "color", "field": "Industry"},
           "fillOpacity": {"value": 0.8}
         },
         "hover": {"fillOpacity": {"value": 1}}
       }
     },
-
-    /* Thick borders for industry groups (parent nodes) */
     {
       "type": "rect",
       "from": {"data": "nodes"},
       "encode": {
         "enter": {"stroke": {"value": "#000"}, "strokeWidth": {"value": 1}},
-        "update": {
-          "x": {"field": "x0"},
-          "x2": {"field": "x1"},
-          "y": {"field": "y0"},
-          "y2": {"field": "y1"},
-          "fill": {"value": "transparent"}
-        }
+        "update": {"x": {"field": "x0"}, "x2": {"field": "x1"}, "y": {"field": "y0"}, "y2": {"field": "y1"}, "fill": {"value": "transparent"}}
       }
     },
-
-    /* Thin white grid over leaves + tooltip & hover effect */
     {
       "type": "rect",
       "from": {"data": "leaves"},
       "encode": {
         "enter": {"stroke": {"value": "#ffffff"}, "strokeWidth": {"value": 0.2}},
         "update": {
-          "x": {"field": "x0"},
-          "x2": {"field": "x1"},
-          "y": {"field": "y0"},
-          "y2": {"field": "y1"},
+          "x": {"field": "x0"}, "x2": {"field": "x1"},
+          "y": {"field": "y0"}, "y2": {"field": "y1"},
           "fill": {"value": "transparent"},
-          "tooltip": {
-            "signal": "'Industry: ' + datum.Industry + '\\nCompany: ' + datum.Company + '\\nValuation: $' + datum['Valuation ($B)'] + 'B'"
-          }
+          "tooltip": {"signal": "'Industry: ' + datum.Industry + '\\nCompany: ' + datum.Company + '\\nValuation: $' + datum['Valuation ($B)'] + 'B'"}
         },
-        "hover": {
-          "fill": {"scale": "color", "field": "Industry"},
-          "fillOpacity": {"value": 1}
-        }
+        "hover": {"fill": {"scale": "color", "field": "Industry"}, "fillOpacity": {"value": 1}}
       }
     },
-
-    /* Labels for companies (hide 'Other companies', auto-hide in tiny tiles) */
     {
       "type": "text",
       "from": {"data": "leaves"},
@@ -136,23 +104,14 @@
           "baseline": {"value": "middle"},
           "fill": {"value": "#000"},
           "fontWeight": {"value": "bold"},
-          "text": {
-            "signal": "datum.Company == 'Other companies' ? '' : datum.Company"
-          },
-          "fontSize": [
-            {"test": "datum['Valuation ($B)'] > 100", "value": 14},
-            {"test": "datum['Valuation ($B)'] > 50", "value": 12},
-            {"value": 10}
-          ]
+          "text": {"signal": "datum.Company == 'Other companies' ? '' : datum.Company"}
         },
         "update": {
           "x": {"signal": "0.5 * (datum.x0 + datum.x1)"},
           "y": {"signal": "0.5 * (datum.y0 + datum.y1)"},
+          "fontSize": {"signal": "clamp(sqrt(max(1,(datum.x1-datum.x0)*(datum.y1-datum.y0)))/6, 7, 16)"},
           "fillOpacity": [
-            {
-              "test": "((datum.x1 - datum.x0) * (datum.y1 - datum.y0) > 1200) || datum['Valuation ($B)'] > 140 || datum.Company=='ByteDance' || datum.Company=='SHEIN' || datum.Company=='Canva' || datum.Company=='SpaceX'",
-              "value": 1
-            },
+            {"test": "(datum.x1 - datum.x0) >= 32 && (datum.y1 - datum.y0) >= 18 && ((datum.x1-datum.x0)*(datum.y1-datum.y0)) >= 900", "value": 1},
             {"value": 0}
           ]
         }
@@ -160,8 +119,5 @@
     }
   ],
 
-  "config": {
-    "view": {"stroke": null},
-    "background": null
-  }
+  "config": {"view": {"stroke": null}, "background": null}
 }
