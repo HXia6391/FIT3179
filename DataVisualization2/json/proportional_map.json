@@ -1,0 +1,116 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1100,
+  "height": 500,
+  "title": {
+    "text": "Where Unicorn Startups Come From",
+    "subtitle": "Bubble size ∝ number of unicorns by country",
+    "font": "Verdana",
+    "fontSize": 16,
+    "subtitleFont": "Verdana",
+    "subtitleFontSize": 12
+  },
+  "projection": {"type": "equalEarth"},
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/7_others/oceans.topojson",
+        "format": {"type": "topojson", "feature": "oceans"}
+      },
+      "mark": {"type": "geoshape", "fill": "#c5e2f7"}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/W9%20Homework/ne_110m.json",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "seashell", "stroke": "#BBBBBB"}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/W9%20Homework/ne_110m.json",
+        "format": {"type": "topojson", "feature": "ne_110m_graticules_30"}
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": null,
+        "stroke": "#CCCCCC",
+        "strokeDash": [2, 2],
+        "strokeWidth": 0.7
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/W9%20Homework/country_origin_unicorn_startup.csv"
+      },
+      "transform": [{"calculate": "toNumber(datum.Count)", "as": "CountNum"}],
+      "mark": {
+        "type": "circle",
+        "opacity": 0.9,
+        "stroke": "white",
+        "strokeWidth": 0.5
+      },
+      "encoding": {
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "size": {
+          "field": "CountNum",
+          "type": "quantitative",
+          "title": "Number of Unicorns",
+          "scale": {"type": "sqrt", "range": [20, 2000]},
+          "legend": {"values": [1, 10, 50, 100, 300, 600]}
+        },
+        "order": {"field": "CountNum", "sort": "ascending"},
+        "tooltip": [
+          {"field": "Country", "type": "nominal"},
+          {
+            "field": "CountNum",
+            "type": "quantitative",
+            "title": "Unicorns",
+            "format": ","
+          }
+        ],
+        "color": {"value": "#6F38C5"}
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Hxia6391/FIT3179/main/W9%20Homework/country_origin_unicorn_startup.csv"
+      },
+      "transform": [
+        {"calculate": "toNumber(datum.Count)", "as": "CountNum"},
+        {
+          "window": [{"op": "rank", "as": "rank"}],
+          "sort": [{"field": "CountNum", "order": "descending"}]
+        },
+        {"filter": "datum.rank <= 10"}
+      ],
+      "mark": {
+        "type": "text",
+        "baseline": "middle",
+        "font": "Verdana",
+        "fontSize": 11,
+        "fontWeight": "bold"
+      },
+      "encoding": {
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "text": {"field": "Country", "type": "nominal"},
+        "align": {
+          "condition": {"test": "datum.lon >= 0", "value": "left"},
+          "value": "right"
+        },
+        "dx": {
+          "condition": {"test": "datum.lon >= 0", "value": 6},
+          "value": -6
+        },
+        "color": {"value": "black"}
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "background": null,
+    "legend": {"padding": 5, "symbolType": "circle"}
+  }
+}
